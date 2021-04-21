@@ -27,6 +27,12 @@ String getChangedFilesList() {
 
 }
 
+def isGSBranch() {
+
+    return env.BRANCH_NAME ==~ /gs\/[0-9]+\.[0-9]+\.[0-9]+/ && CODE_CHANGES == true
+
+}
+
 def initEnvironment() {
 
     changedFiles = getChangedFilesList()

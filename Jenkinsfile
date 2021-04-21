@@ -9,7 +9,6 @@
 //              Jenkins host: https://jenkins.gsedxlms.com/
 //
 //              Jenkins variables: https://jenkins.gsedxlms.com/env-vars.html/
-//
 // ----------------------------------------------------------------------------
 def gv 
 
@@ -19,8 +18,8 @@ pipeline {
     agent any
 
     environment {
-        NEW_VERSION = '1.0.1'
-        SSH_KEY = credentials('gs-edx-staging')
+        //NEW_VERSION = '1.0.1'
+        //SSH_KEY = credentials('gs-edx-staging')
     }
 
     parameters {
@@ -49,7 +48,11 @@ pipeline {
 
         }
         stage("build") {
-
+            when {
+                expression {
+                    gv.isGSBranch()
+                }
+            }
             steps {
 
                 script {
@@ -62,12 +65,7 @@ pipeline {
         stage("test") {
             when {
                 expression {
-                    // if we indicated that we want to execute tests, 
-                    // and we're not currently on koa.master
-                    // and the source code has actually been modified
-                    //env.BRANCH_NAME != 'koa.master' && 
-                    params.executeTests && 
-                    CODE_CHANGES == true
+                    gv.isGSBranch()
                 }
             }
             steps {
@@ -76,7 +74,11 @@ pipeline {
 
         }
         stage("deploy") {
-
+            when {
+                expression {
+                    gv.isGSBranch()
+                }
+            }
             steps {
                 gv.testApp()
 
