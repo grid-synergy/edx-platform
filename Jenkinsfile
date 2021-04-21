@@ -12,16 +12,22 @@
 // ----------------------------------------------------------------------------
 def gv 
 
+// global variables
+// ----------------------------------
 CODE_CHANGES = getGitChanges()
+
 pipeline {
 
+    // required, but not of interest to us for now.
     agent any
 
+    // optional environment variables
     environment {
         //NEW_VERSION = '1.0.1'
         //SSH_KEY = credentials('gs-edx-staging')
     }
 
+    // optional jenkins job parameters
     parameters {
 
         //string(name: 'VERSION', defaultValue: 'xx', description: 'Version number to use with koa.master release.')
@@ -30,12 +36,17 @@ pipeline {
 
     }
 
+    // optional remote tools that we could include if we wanted
     tools {
         //maven
         //gradle
         //jdk
     }
 
+
+    // +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    // THE GRID SYNERGY JENKINS PIPELINE STAGES
+    // +++++++++++++++++++++++++++++++++++++++++++++++++++++++
     stages {
         stage("init") {
 
@@ -99,7 +110,11 @@ pipeline {
         
     }
 
-    post {
+    // +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    // THESE ARE ACTIONS THAT WE TAKE BASED ON THE JENKINS 
+    // PIPELINE RESULT.
+    // +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   post {
 
         always {
 
