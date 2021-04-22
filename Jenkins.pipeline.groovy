@@ -23,9 +23,10 @@ def initEnvironment() {
     echo ''
     echo "Git repository: ${GIT_URL}"
     echo "Git Branch: ${GIT_BRANCH}"
-    echo "Git Pull author: ${CHANGE_AUTHOR}"
-    echo "Git Pull request: ${CHANGE_ID}"
-    echo "Git Pull branch target: ${CHANGE_TARGET}"
+    if (env.CHANGE_AUTHOR) {echo "Git Pull author: ${CHANGE_AUTHOR}"}
+    if (env.CHANGE_ID) {echo "Git Pull request: ${CHANGE_ID}"}
+    if (env.CHANGE_TARGET) {echo "Git Pull branch target: ${CHANGE_TARGET}"}
+    
     echo "Git Commit: ${GIT_COMMIT}"
     echo "Git Build Number: ${BUILD_NUMBER}"
     echo "Git committer: ${GIT_COMMITTER_NAME} ${GIT_COMMITTER_EMAIL}"
@@ -39,15 +40,18 @@ def initEnvironment() {
     echo 'Jenkins environment variables:'
     echo '------------------------------'
     echo "BRANCH_NAME: ${BRANCH_NAME}"
-    echo "CHANGE_ID: ${CHANGE_ID}"
-    echo "CHANGE_URL ${CHANGE_URL}"
-    echo "CHANGE_TITLE ${CHANGE_TITLE}"
-    echo "CHANGE_AUTHOR ${CHANGE_AUTHOR}"
-    echo "CHANGE_AUTHOR_DISPLAY_NAME ${CHANGE_AUTHOR_DISPLAY_NAME}"
-    echo "CHANGE_AUTHOR_EMAIL ${CHANGE_AUTHOR_EMAIL}"
-    echo "CHANGE_TARGET ${CHANGE_TARGET}"
-    echo "CHANGE_BRANCH ${CHANGE_BRANCH}"
-    echo "CHANGE_FORK ${CHANGE_FORK}"
+    if (env.CHANGE_ID) {
+        echo 'optional Pull request variables'
+        echo "CHANGE_ID: ${CHANGE_ID}"
+        echo "CHANGE_URL ${CHANGE_URL}"
+        echo "CHANGE_TITLE ${CHANGE_TITLE}"
+        echo "CHANGE_AUTHOR ${CHANGE_AUTHOR}"
+        echo "CHANGE_AUTHOR_DISPLAY_NAME ${CHANGE_AUTHOR_DISPLAY_NAME}"
+        echo "CHANGE_AUTHOR_EMAIL ${CHANGE_AUTHOR_EMAIL}"
+        echo "CHANGE_TARGET ${CHANGE_TARGET}"
+        echo "CHANGE_BRANCH ${CHANGE_BRANCH}"
+        echo "CHANGE_FORK ${CHANGE_FORK}"
+    }
     echo "TAG_NAME ${TAG_NAME}"
     echo "TAG_TIMESTAMP ${TAG_TIMESTAMP}"
     echo "TAG_UNIXTIME ${TAG_UNIXTIME}"
