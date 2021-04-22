@@ -68,4 +68,29 @@ pipeline {
         }        
 
     }
+
+    // +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    // THESE ARE ACTIONS THAT WE TAKE BASED ON THE JENKINS 
+    // PIPELINE RESULT.
+    // +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   post {
+
+        always {
+
+            gv.cleanupEnvironment()
+
+        }
+
+        failure {
+
+            gv.postFailure()
+
+        }
+
+        success {
+
+            gv.postSuccess()
+
+        }
+    }    
 }
