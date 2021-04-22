@@ -1,30 +1,10 @@
 pipeline {
-
-    agent any
-
+    agent { docker { image 'python:3.5.1' } }
     stages {
-        stage("build") {
-
+        stage('build') {
             steps {
-                echo "build"
+                sh 'python --version'
             }
-
         }
-        stage("test") {
-
-            steps {
-                echo "test"
-            }
-
-        }
-        stage("deploy") {
-
-            steps {
-                echo "deploy"
-            }
-
-        }
-
-        
     }
 }
