@@ -13,6 +13,30 @@
 //
 // ----------------------------------------------------------------------------
 
+// returns a list of changed files
+// see: https://stackoverflow.com/questions/54175878/which-jenkins-command-to-get-the-list-of-changed-files
+@NonCPS
+String getChangedFilesList() {
+
+    changedFiles = []
+    for (changeLogSet in currentBuild.changeSets) { 
+        for (entry in changeLogSet.getItems()) { // for each commit in the detected changes
+            for (file in entry.getAffectedFiles()) {
+                changedFiles.add(file.getPath()) // add changed file to list
+            }
+        }
+    }
+
+    return changedFiles
+
+}
+
+// true if the branch name begins with "gs/" and there are code modifications.
+def isGSBranch() {
+
+    return env.BRANCH_NAME ==~ /gs\/[0-9]+\.[0-9]+\.[0-9]+/ && CODE_CHANGES == true
+
+}
 
 def initEnvironment() {
 
@@ -95,6 +119,85 @@ def initEnvironment() {
 
 }
 
+def buildApp() {
+
+
+    // see notes in testApp
+
+    echo 'Building edx-platform...'
+
+
+}
+
+def testApp() {
+
+    echo 'Testing edx-platform...'
+
+    // a couple of choices for this:
+    // 1. run tests on a remote EC2 instance, initiated by calling a bash script.
+    // 2. run tests on this EC2 instance.
+
+}
+
+def deployApp() {
+
+    echo 'Deploying edx-platform...'
+    echo "Using ssh key ${SSH_KEY}"
+    echo "Deploying version ${params.VERSION}"
+
+    // nothing else to do here.
+
+}
+
+def cleanupEnvironment() {
+
+    echo 'Cleaning up Jenkins environment...'
+
+}
+
+def postFailure() {
+
+    echo 'Jenkins post - Failure...'
+
+    // post a message back to the pull requests that Jenkins job failed.
+
+
+}
+
+def postSuccess() {
+
+    echo 'Jenkins post - Success...'
+    echo "This pull request / commit will merge into ${CHANGE_TARGET}"
+
+    // This is currently the best way to push a tag (or a branch, etc) from a
+    // Pipeline job. It's not ideal - https://issues.jenkins-ci.org/browse/JENKINS-28335
+    // is an open JIRA for getting the GitPublisher Jenkins functionality working
+    // with Pipeline.
+
+    if (env.CHANGE_ID) {
+        echo 'This is a pull request. Tests succeeded, so we will merge this code to koa.master'
+
+        // credentialsId here is the credentials you have set up in Jenkins for pushing
+        // to that repository using username and password.
+        //withCredentials([usernamePassword(credentialsId: 'cd31dbc2-0825-40d7-ab0d-9bd198538162', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+        //    sh("git tag -a some_tag -m 'Jenkins'")
+        //    sh('git push https://${GIT_USERNAME}:${GIT_PASSWORD}@<REPO> --tags')
+        //}
+
+    } else {
+        echo 'This is not a pull request. nothing more to do, even though tests succeeded.'
+    }
+
+
+    // For SSH private key authentication, try the sshagent step from the SSH Agent plugin.
+    //sshagent (credentials: ['git-ssh-credentials-ID']) {
+    //    sh("git tag -a some_tag -m 'Jenkins'")
+    //    sh('git push <REPO> --tags')
+    //
+    //}
+
+
+}
 
 
 return this
