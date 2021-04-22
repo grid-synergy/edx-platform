@@ -40,6 +40,7 @@ def initEnvironment() {
     echo 'Jenkins environment variables:'
     echo '------------------------------'
     echo "BRANCH_NAME: ${BRANCH_NAME}"
+
     if (env.CHANGE_ID) {
         echo 'optional Pull request variables'
         echo "CHANGE_ID: ${CHANGE_ID}"
@@ -52,36 +53,45 @@ def initEnvironment() {
         echo "CHANGE_BRANCH ${CHANGE_BRANCH}"
         echo "CHANGE_FORK ${CHANGE_FORK}"
     }
-    echo "TAG_NAME ${TAG_NAME}"
-    echo "TAG_TIMESTAMP ${TAG_TIMESTAMP}"
-    echo "TAG_UNIXTIME ${TAG_UNIXTIME}"
-    echo "TAG_DATE ${TAG_DATE}"
-    echo "BUILD_NUMBER ${BUILD_NUMBER}"
-    echo "BUILD_ID ${BUILD_ID}"
-    echo "BUILD_DISPLAY_NAME ${BUILD_DISPLAY_NAME}"
-    echo "JOB_NAME ${JOB_NAME}"
-    echo "JOB_BASE_NAME ${JOB_BASE_NAME}"
-    echo "BUILD_TAG ${BUILD_TAG}"
-    echo "EXECUTOR_NUMBER ${EXECUTOR_NUMBER}"
-    echo "NODE_NAME ${NODE_NAME}"
-    echo "NODE_LABELS ${NODE_LABELS}"
-    echo "WORKSPACE ${WORKSPACE}"
-    echo "WORKSPACE_TMP ${WORKSPACE_TMP}"
-    echo "JENKINS_HOME ${JENKINS_HOME}"
-    echo "JENKINS_URL ${JENKINS_URL}"
-    echo "BUILD_URL ${BUILD_URL}"
-    echo "JOB_URL ${JOB_URL}"
-    echo "GIT_COMMIT ${GIT_COMMIT}"
-    echo "GIT_PREVIOUS_COMMIT ${GIT_PREVIOUS_COMMIT}"
-    echo "GIT_PREVIOUS_SUCCESSFUL_COMMIT ${GIT_PREVIOUS_SUCCESSFUL_COMMIT}"
-    echo "GIT_BRANCH ${GIT_BRANCH}"
-    echo "GIT_LOCAL_BRANCH ${GIT_LOCAL_BRANCH}"
-    echo "GIT_CHECKOUT_DIR ${GIT_CHECKOUT_DIR}"
-    echo "GIT_URL ${GIT_URL}"
-    echo "GIT_COMMITTER_NAME ${GIT_COMMITTER_NAME}"
-    echo "GIT_AUTHOR_NAME ${GIT_AUTHOR_NAME}"
-    echo "GIT_COMMITTER_EMAIL ${GIT_COMMITTER_EMAIL}"
-    echo "GIT_AUTHOR_EMAIL ${GIT_AUTHOR_EMAIL}"
+
+    if (env.TAG_NAME) {
+        echo 'optional Git Tag variables'
+        echo "TAG_NAME ${TAG_NAME}"
+        echo "TAG_TIMESTAMP ${TAG_TIMESTAMP}"
+        echo "TAG_UNIXTIME ${TAG_UNIXTIME}"
+        echo "TAG_DATE ${TAG_DATE}"
+    }
+
+    
+    if (env.BUILD_NUMBER) {echo "BUILD_NUMBER ${BUILD_NUMBER}"}
+    if (env.BUILD_ID) {echo "BUILD_ID ${BUILD_ID}"}
+    if (env.BUILD_DISPLAY_NAME) {echo "BUILD_DISPLAY_NAME ${BUILD_DISPLAY_NAME}"}
+    if (env.BUILD_TAG) {echo "BUILD_TAG ${BUILD_TAG}"}
+    if (env.BUILD_URL) {echo "BUILD_URL ${BUILD_URL}"}
+
+    if (env.JOB_NAME) {echo "JOB_NAME ${JOB_NAME}"}
+    if (env.JOB_BASE_NAME) {echo "JOB_BASE_NAME ${JOB_BASE_NAME}"}
+    if (env.JOB_URL) {echo "JOB_URL ${JOB_URL}"}
+
+    if (env.EXECUTOR_NUMBER) {echo "EXECUTOR_NUMBER ${EXECUTOR_NUMBER}"}
+    if (env.NODE_NAME) {echo "NODE_NAME ${NODE_NAME}"}
+    if (env.NODE_LABELS) {echo "NODE_LABELS ${NODE_LABELS}"}
+    if (env.WORKSPACE) {echo "WORKSPACE ${WORKSPACE}"}
+    if (env.WORKSPACE_TMP) {echo "WORKSPACE_TMP ${WORKSPACE_TMP}"}
+    if (env.JENKINS_HOME) {echo "JENKINS_HOME ${JENKINS_HOME}"}
+    if (env.JENKINS_URL) {echo "JENKINS_URL ${JENKINS_URL}"}
+
+    if (env.GIT_COMMIT) {echo "GIT_COMMIT ${GIT_COMMIT}"}
+    if (env.GIT_PREVIOUS_COMMIT) {echo "GIT_PREVIOUS_COMMIT ${GIT_PREVIOUS_COMMIT}"}
+    if (env.GIT_PREVIOUS_SUCCESSFUL_COMMIT) {echo "GIT_PREVIOUS_SUCCESSFUL_COMMIT ${GIT_PREVIOUS_SUCCESSFUL_COMMIT}"}
+    if (env.GIT_BRANCH) {echo "GIT_BRANCH ${GIT_BRANCH}"}
+    if (env.GIT_LOCAL_BRANCH) {echo "GIT_LOCAL_BRANCH ${GIT_LOCAL_BRANCH}"}
+    if (env.GIT_CHECKOUT_DIR) {echo "GIT_CHECKOUT_DIR ${GIT_CHECKOUT_DIR}"}
+    if (env.GIT_URL) {echo "GIT_URL ${GIT_URL}"}
+    if (env.GIT_COMMITTER_NAME) {echo "GIT_COMMITTER_NAME ${GIT_COMMITTER_NAME}"}
+    if (env.GIT_AUTHOR_NAME) {echo "GIT_AUTHOR_NAME ${GIT_AUTHOR_NAME}"}
+    if (env.GIT_COMMITTER_EMAIL) {echo "GIT_COMMITTER_EMAIL ${GIT_COMMITTER_EMAIL}"}
+    if (env.GIT_AUTHOR_EMAIL) {echo "GIT_AUTHOR_EMAIL ${GIT_AUTHOR_EMAIL}"}
 
 }
 
