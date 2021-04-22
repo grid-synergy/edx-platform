@@ -32,7 +32,7 @@ def initEnvironment() {
     echo "Git committer: ${GIT_COMMITTER_NAME} ${GIT_COMMITTER_EMAIL}"
     echo "Git author: ${GIT_AUTHOR_NAME} ${GIT_AUTHOR_EMAIL}"
     echo ''
-    echo "Initializing Jenkins for version ${NEW_VERSION}"
+    //echo "Initializing Jenkins for version ${NEW_VERSION}"
     echo 'I harken from Jenkins.pipeline.groovy in the root folder of this git repository'
     echo ''
 
