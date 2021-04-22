@@ -60,14 +60,7 @@ def initEnvironment() {
     echo 'I harken from Jenkins.pipeline.groovy in the root folder of this git repository'
     echo ''
     echo "Git changed files list: ${changedFiles}"
-}
 
-def buildApp() {
-
-
-    // see notes in testApp
-
-    echo 'Building edx-platform...'
     echo ''
     echo 'Jenkins environment variables:'
     echo '------------------------------'
@@ -111,6 +104,16 @@ def buildApp() {
     echo "GIT_AUTHOR_NAME ${GIT_AUTHOR_NAME}"
     echo "GIT_COMMITTER_EMAIL ${GIT_COMMITTER_EMAIL}"
     echo "GIT_AUTHOR_EMAIL ${GIT_AUTHOR_EMAIL}"
+
+}
+
+def buildApp() {
+
+
+    // see notes in testApp
+
+    echo 'Building edx-platform...'
+
 
 }
 
