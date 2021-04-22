@@ -125,6 +125,7 @@ def buildApp() {
     // see notes in testApp
 
     echo 'Building edx-platform...'
+    sh 'python --version'
 
 
 }
@@ -132,6 +133,7 @@ def buildApp() {
 def testApp() {
 
     echo 'Testing edx-platform...'
+    sh 'python --version'
 
     // a couple of choices for this:
     // 1. run tests on a remote EC2 instance, initiated by calling a bash script.
@@ -142,8 +144,9 @@ def testApp() {
 def deployApp() {
 
     echo 'Deploying edx-platform...'
-    echo "Using ssh key ${SSH_KEY}"
-    echo "Deploying version ${params.VERSION}"
+    sh 'python --version'
+    //echo "Using ssh key ${SSH_KEY}"
+    //echo "Deploying version ${params.VERSION}"
 
     // nothing else to do here.
 

@@ -32,9 +32,40 @@ pipeline {
         stage('build') {
 
             steps {
-                sh 'python --version'
+                script {
+                    gv.buildApp()
+                }
             }
 
         }
+
+        stage("test") {
+
+            steps {
+                gv.testApp()
+            }
+
+        }
+
+        stage("deploy") {
+
+            steps {
+
+                gv.testApp()
+
+                // requires plugins: Credentials, Credentials Binding
+                //withCredentials([
+                //    usernamePassword(
+                //        credentials: 'gs-edx-staging', 
+                //        usernameVariable: USER, 
+                //        passwordVariable: PWD)
+                //]) {
+                //        // user, pwd available here.
+                //        echo "username is ${USER}."
+                //}
+            }
+
+        }        
+
     }
 }
