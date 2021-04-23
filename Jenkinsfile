@@ -15,6 +15,7 @@ def gv
 pipeline {
 
     agent { docker { image 'python:3.5.1' } }
+    //agent any 
 
     stages {
 
@@ -33,6 +34,11 @@ pipeline {
 
             steps {
                 script {
+                    if (gv.isGSBranch()) {
+                        echo 'this is a gs/ branch: building'
+                    } else {
+                        echo 'this is not a gs/ branch but we will build it anyway'
+                    }
                     gv.buildApp()
                 }
             }
@@ -42,7 +48,14 @@ pipeline {
         stage("test") {
 
             steps {
-                gv.testApp()
+                script {
+                    if (gv.isGSBranch()) {
+                        echo 'this is a gs/ branch: testing'
+                    } else {
+                        echo 'this is not a gs/ branch but we will test anyway'
+                    }
+                    gv.testApp()
+                }
             }
 
         }
@@ -51,7 +64,13 @@ pipeline {
 
             steps {
 
-                gv.testApp()
+                script {
+                    if (gv.isGSBranch()) {
+                        gv.deployApp()
+                    } else {
+                        echo 'this is not a gs/ branch. not deploying'
+                    }
+                }
 
                 // requires plugins: Credentials, Credentials Binding
                 //withCredentials([
@@ -77,20 +96,24 @@ pipeline {
 
         always {
 
-            gv.cleanupEnvironment()
+            echo 'Cleaning up Jenkins environment...'
 
         }
 
         failure {
+            
+            echo 'Jenkins post - Failure...'
 
-            gv.postFailure()
+            // post a message back to the pull requests that Jenkins job failed.
 
         }
 
         success {
 
-            gv.postSuccess()
+            echo 'Jenkins post - Success...'
+            echo "This pull request / commit merged into koa.master"
 
         }
     }    
+
 }

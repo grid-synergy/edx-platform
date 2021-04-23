@@ -40,6 +40,7 @@ def isGSBranch() {
 
 def initEnvironment() {
 
+    changedFiles = getChangedFilesList()
 
     echo 'Initializing Jenkins environment...'
     echo "Jenkins Build URL: ${BUILD_URL}"
@@ -53,12 +54,19 @@ def initEnvironment() {
     
     echo "Git Commit: ${GIT_COMMIT}"
     echo "Git Build Number: ${BUILD_NUMBER}"
-    echo "Git committer: ${GIT_COMMITTER_NAME} ${GIT_COMMITTER_EMAIL}"
-    echo "Git author: ${GIT_AUTHOR_NAME} ${GIT_AUTHOR_EMAIL}"
+    if (env.GIT_COMMITTER_NAME) {
+            echo "Git committer: ${GIT_COMMITTER_NAME} ${GIT_COMMITTER_EMAIL}"
+        }
+    
+    if (env.GIT_AUTHOR_NAME) {
+        echo "Git author: ${GIT_AUTHOR_NAME} ${GIT_AUTHOR_EMAIL}"
+    }
+
     echo ''
     //echo "Initializing Jenkins for version ${NEW_VERSION}"
     echo 'I harken from Jenkins.pipeline.groovy in the root folder of this git repository'
     echo ''
+    echo "Git changed files list: ${changedFiles}"
 
     echo ''
     echo 'Jenkins environment variables:'
@@ -148,36 +156,21 @@ def deployApp() {
     //echo "Using ssh key ${SSH_KEY}"
     //echo "Deploying version ${params.VERSION}"
 
-    // nothing else to do here.
-
-}
-
-def cleanupEnvironment() {
-
-    echo 'Cleaning up Jenkins environment...'
-
-}
-
-def postFailure() {
-
-    echo 'Jenkins post - Failure...'
-
-    // post a message back to the pull requests that Jenkins job failed.
-
-
-}
-
-def postSuccess() {
-
-    echo 'Jenkins post - Success...'
-    echo "This pull request / commit will merge into ${CHANGE_TARGET}"
-
-    // This is currently the best way to push a tag (or a branch, etc) from a
-    // Pipeline job. It's not ideal - https://issues.jenkins-ci.org/browse/JENKINS-28335
-    // is an open JIRA for getting the GitPublisher Jenkins functionality working
-    // with Pipeline.
-
     if (env.CHANGE_ID) {
+        // This is currently the best way to push a tag (or a branch, etc) from a
+        // Pipeline job. It's not ideal - https://issues.jenkins-ci.org/browse/JENKINS-28335
+        // is an open JIRA for getting the GitPublisher Jenkins functionality working
+        // with Pipeline.
+
+
+
+        // For SSH private key authentication, try the sshagent step from the SSH Agent plugin.
+        //sshagent (credentials: ['git-ssh-credentials-ID']) {
+        //    sh("git tag -a some_tag -m 'Jenkins'")
+        //    sh('git push <REPO> --tags')
+        //
+        //}
+
         echo 'This is a pull request. Tests succeeded, so we will merge this code to koa.master'
 
         // credentialsId here is the credentials you have set up in Jenkins for pushing
@@ -190,15 +183,6 @@ def postSuccess() {
     } else {
         echo 'This is not a pull request. nothing more to do, even though tests succeeded.'
     }
-
-
-    // For SSH private key authentication, try the sshagent step from the SSH Agent plugin.
-    //sshagent (credentials: ['git-ssh-credentials-ID']) {
-    //    sh("git tag -a some_tag -m 'Jenkins'")
-    //    sh('git push <REPO> --tags')
-    //
-    //}
-
 
 }
 
