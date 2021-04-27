@@ -118,7 +118,6 @@ pipeline {
         failure {
             
             echo 'Jenkins post - Failure...'
-            slackSend channel: '#general', color: 'bad', message: '$DEFAULT_CONTENT'
 
             script {
 
@@ -137,7 +136,7 @@ pipeline {
         success {
             echo 'Jenkins post - Success...'
             echo "This pull request / commit merged into koa.master"
-            slackSend channel: '#general', color: 'good', message: '$DEFAULT_CONTENT'
+            slackSend channel: '#general', color: 'good', message: "The pipeline ${currentBuild.fullDisplayName} ${BRANCH_NAME} succeeded."
 
         }
 

@@ -165,7 +165,7 @@ def buildApp() {
 
     echo 'Building edx-platform...'
     sh 'python --version'
-    sh 'expr 1 / 0'
+    sh 'expr 1 + 0'
 
 }
 
