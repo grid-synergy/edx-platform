@@ -34,7 +34,7 @@ String getChangedFilesList() {
 // true if the branch name begins with "gs/" and there are code modifications.
 def isGSBranch() {
 
-    return env.BRANCH_NAME ==~ /gs\/[0-9]+\.[0-9]+\.[0-9]+/ && CODE_CHANGES == true
+    return env.BRANCH_NAME ==~ /gs\/[0-9]+\.[0-9]+\.[0-9]+/
 
 }
 
@@ -68,7 +68,6 @@ String getGitHubMetadata() {
     //echo "Initializing Jenkins for version ${NEW_VERSION}"
     
     metaData = metaData + "I harken from Jenkins.pipeline.groovy in the root folder of this git repository\n"
-    metaData = metaData + "\n"
     metaData = metaData + "Git changed files list: ${changedFiles}\n"
 
     metaData = metaData + "\n"
