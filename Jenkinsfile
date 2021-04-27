@@ -118,15 +118,26 @@ pipeline {
         failure {
             
             echo 'Jenkins post - Failure...'
-            // post a message back to the pull requests that Jenkins job failed.
-            slackSend channel: '#general', color: 'good', message: "The pipeline ${currentBuild.fullDisplayName} failed."
+            slackSend channel: '#general', color: 'bad', message: '$DEFAULT_CONTENT'
 
+            script {
+
+                emailext subject: '$DEFAULT_SUBJECT',
+                    body: '$DEFAULT_CONTENT',
+                    recipientProviders: [
+                        [$class: 'DevelopersRecipientProvider'],
+                        [$class: 'RequesterRecipientProvider']
+                    ], 
+                    replyTo: '$DEFAULT_REPLYTO',
+                    to: '$DEFAULT_RECIPIENTS'
+
+            }
         }
 
         success {
             echo 'Jenkins post - Success...'
             echo "This pull request / commit merged into koa.master"
-            slackSend channel: '#general', color: 'good', message: "The pipeline ${currentBuild.fullDisplayName} completed successfully."
+            slackSend channel: '#general', color: 'good', message: '$DEFAULT_CONTENT'
 
         }
 
@@ -142,20 +153,22 @@ pipeline {
                             [$class: 'RequesterRecipientProvider']
                         ], 
                         replyTo: '$DEFAULT_REPLYTO',
-                        to: '$DEFAULT_RECIPIENTS'
+                        to: 'andrew@gridsynergy.com.sg'
+                    
+                    slackSend channel: '#general', color: 'good', message: '$DEFAULT_CONTENT'
+
                 }
 
                 if (currentBuild.currentResult == 'FAILURE') { // Other values: SUCCESS, UNSTABLE
                     // Send an email only if the build status has changed from green/unstable to red
                     emailext subject: '$DEFAULT_SUBJECT',
                         body: '$DEFAULT_CONTENT',
-                        recipientProviders: [
-                            [$class: 'CulpritsRecipientProvider'],
-                            [$class: 'DevelopersRecipientProvider'],
-                            [$class: 'RequesterRecipientProvider']
-                        ], 
+                        recipientProviders: [[$class: 'CulpritsRecipientProvider']], 
                         replyTo: '$DEFAULT_REPLYTO',
-                        to: '$DEFAULT_RECIPIENTS'
+                        to: 'andrew@gridsynergy.com.sg'
+
+                    slackSend channel: '#general', color: 'bad', message: '$DEFAULT_CONTENT'
+
                 }
 
                 if (currentBuild.currentResult == 'UNSTABLE') { // Other values: SUCCESS, UNSTABLE
@@ -168,7 +181,10 @@ pipeline {
                             [$class: 'RequesterRecipientProvider']
                         ], 
                         replyTo: '$DEFAULT_REPLYTO',
-                        to: '$DEFAULT_RECIPIENTS'
+                        to: 'andrew@gridsynergy.com.sg'
+
+                    slackSend channel: '#general', color: 'bad', message: '$DEFAULT_CONTENT'
+
                 }
 
             }
