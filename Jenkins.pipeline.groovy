@@ -129,6 +129,7 @@ String getGitHubMetadata() {
     if (env.GIT_COMMITTER_EMAIL) {metaData = metaData + "GIT_COMMITTER_EMAIL ${GIT_COMMITTER_EMAIL}\n"}
     if (env.GIT_AUTHOR_EMAIL) {metaData = metaData + "GIT_AUTHOR_EMAIL ${GIT_AUTHOR_EMAIL}\n"}
 
+    return metaData
 }
 
 def initEnvironment() {
