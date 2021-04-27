@@ -24,16 +24,21 @@ pipeline {
 
             steps {
                 script {
-                    // test #13
+                    // test #14
                     gv = load "Jenkins.pipeline.groovy"
                     gv.initEnvironment()
 
-                    def email_subject = "Jenkins build ${BUILD_ID} for commit ${GIT_COMMIT} of branch ${GIT_BRANCH} in repository ${GIT_URL}"
+                    def email_subject = "Jenkins build ${BUILD_ID}: ${GIT_BRANCH} in ${GIT_URL}"
                     def email_body = gv.getGitHubMetadata()
+                    def email_providers = [ [$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider'] ];
+
+                    email_providers.add ( [$class: 'RequesterRecipientProvider'] );
+
                     emailext (
                         to: 'andrew@gridsynergy.com.sg',
-                        recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], 
+                        recipientProviders: email_providers,
                         subject: email_subject,
+                        attachLog: true,
                         body: email_body
                     )
                 }
