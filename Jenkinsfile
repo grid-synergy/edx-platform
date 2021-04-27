@@ -136,7 +136,8 @@ pipeline {
         success {
             echo 'Jenkins post - Success...'
             echo "This pull request / commit merged into koa.master"
-            slackSend channel: '#general', color: 'good', message: "The pipeline ${currentBuild.fullDisplayName} ${BRANCH_NAME} succeeded."
+            slackSend channel: '#general', color: 'good', message: "The pipeline ${currentBuild.fullDisplayName} ${BRANCH_NAME} succeeded. More info: ${JOB_URL}"
+            slackSend channel: '#general', color: 'good', message: "${currentBuild.fullDisplayName} ${BRANCH_NAME} changed files: ${getChangedFilesList()}"
 
         }
 
@@ -154,7 +155,7 @@ pipeline {
                         replyTo: '$DEFAULT_REPLYTO',
                         to: 'andrew@gridsynergy.com.sg'
                     
-                    slackSend channel: '#general', color: 'good', message: "The pipeline ${currentBuild.fullDisplayName} ${BRANCH_NAME} has stabilized."
+                    slackSend channel: '#general', color: 'good', message: "The pipeline ${currentBuild.fullDisplayName} ${BRANCH_NAME} has stabilized. More info: ${JOB_URL}"
 
                 }
 
@@ -166,7 +167,7 @@ pipeline {
                         replyTo: '$DEFAULT_REPLYTO',
                         to: 'andrew@gridsynergy.com.sg'
 
-                    slackSend channel: '#general', color: 'bad', message: "The pipeline ${currentBuild.fullDisplayName} ${BRANCH_NAME} failed."
+                    slackSend channel: '#general', color: 'bad', message: "The pipeline ${currentBuild.fullDisplayName} ${BRANCH_NAME} failed. More info: ${JOB_URL}"
 
                 }
 
