@@ -29,7 +29,7 @@ pipeline {
                     gv.initEnvironment()
 
                     def email_subject = "Jenkins build ${BUILD_ID} for commit ${GIT_COMMIT} of branch ${GIT_BRANCH} in repository ${GIT_URL}"
-                    def email_body = getGitHubMetadata()
+                    def email_body = gv.getGitHubMetadata()
                     emailext body: "${email_body}", recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], subject: "${email_subject}"
                 }
             }
