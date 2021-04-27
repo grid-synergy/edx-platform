@@ -33,9 +33,16 @@ String getChangedFilesList() {
 
 // true if the branch name begins with "gs/" and there are code modifications.
 def isGSBranch() {
-
-    return env.BRANCH_NAME ==~ /gs\/[0-9]+\.[0-9]+\.[0-9]+/
-
+    return env.BRANCH_NAME.startsWith('gs/')
+}
+def isGSContractorBranch() {
+    return env.BRANCH_NAME.startsWith('gs/crontractor/')
+}
+def isLhubBranch() {
+    return env.BRANCH_NAME.startsWith('lhub/')
+}
+def isProductionBranch() {
+    return env.BRANCH_NAME == 'gs/koa.master'
 }
 
 String getGitHubMetadata() {
@@ -46,6 +53,19 @@ String getGitHubMetadata() {
     metaData = metaData + "Git repository: ${GIT_URL}\n"
     metaData = metaData + "Git Branch: ${GIT_BRANCH}\n"
     
+    if (isProductionBranch()) {
+        metaData = metaData + "This is the production branch\n"
+    }
+    if (isGSBranch()) {
+        metaData = metaData + "This branch is in the Grid Synergy Name Space\n"
+    }
+    if (isGSContractorBranch()) {
+        metaData = metaData + "This is a Grid Synergy contractor branch\n"
+    }
+    if (isLhubBranch()) {
+        metaData = metaData + "This branch is in the LHUB Name Space\n"
+    }
+
     if (env.CHANGE_AUTHOR) {metaData = metaData + "Git Pull author: ${CHANGE_AUTHOR}\n"}
     if (env.CHANGE_ID) {metaData = metaData + "Git Pull request: ${CHANGE_ID}\n"}
     if (env.CHANGE_TARGET) {metaData = metaData + "Git Pull branch target: ${CHANGE_TARGET}\n"}
@@ -124,6 +144,8 @@ String getGitHubMetadata() {
     if (env.GIT_COMMITTER_EMAIL) {metaData = metaData + "GIT_COMMITTER_EMAIL ${GIT_COMMITTER_EMAIL}\n"}
     if (env.GIT_AUTHOR_EMAIL) {metaData = metaData + "GIT_AUTHOR_EMAIL ${GIT_AUTHOR_EMAIL}\n"}
 
+    metaData = metaData + "\n"
+    metaData = metaData + "\n"
     return metaData
 }
 

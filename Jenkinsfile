@@ -24,7 +24,6 @@ pipeline {
 
             steps {
                 script {
-                    // test #14
                     gv = load "Jenkins.pipeline.groovy"
                     gv.initEnvironment()
 
