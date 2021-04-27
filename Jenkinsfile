@@ -118,15 +118,15 @@ pipeline {
         failure {
             
             echo 'Jenkins post - Failure...'
-
             // post a message back to the pull requests that Jenkins job failed.
+            slackSend channel: '#general', color: 'good', message: "The pipeline ${currentBuild.fullDisplayName} failed."
 
         }
 
         success {
-
             echo 'Jenkins post - Success...'
             echo "This pull request / commit merged into koa.master"
+            slackSend channel: '#general', color: 'good', message: "The pipeline ${currentBuild.fullDisplayName} completed successfully."
 
         }
     }    
