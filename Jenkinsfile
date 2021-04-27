@@ -135,9 +135,14 @@ pipeline {
 
         success {
             echo 'Jenkins post - Success...'
-            echo "This pull request / commit merged into koa.master"
-            slackSend channel: '#general', color: 'good', message: "The pipeline ${currentBuild.fullDisplayName} ${BRANCH_NAME} succeeded. More info: ${JOB_URL}"
-            slackSend channel: '#general', color: 'good', message: "${currentBuild.fullDisplayName} ${BRANCH_NAME} changed files: ${getChangedFilesList()}"
+            script {
+                if (gv.isProductionBranch()) {
+                    echo "This pull request / commit merged to production branch."
+                    slackSend channel: '#general', color: 'good', message: "Commit/Merge to production branch: the pipeline ${currentBuild.fullDisplayName} ${BRANCH_NAME}. More info: ${JOB_URL}"
+                    slackSend channel: '#general', color: 'good', message: "${currentBuild.fullDisplayName} ${BRANCH_NAME} committed by ${GIT_COMMITTER_NAME} ${GIT_COMMITTER_EMAIL}"
+                    slackSend channel: '#general', color: 'good', message: "${currentBuild.fullDisplayName} ${BRANCH_NAME} changed files: ${gv.getChangedFilesList()}"
+                }
+            }
 
         }
 
