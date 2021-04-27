@@ -98,7 +98,7 @@ pipeline {
         always {
 
             echo 'Cleaning up Jenkins environment...'
-            // test #2
+            // test #3
             emailext body: 'A Test EMail', recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], subject: 'Test'
 
         }
