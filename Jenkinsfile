@@ -97,11 +97,15 @@ pipeline {
 
         always {
 
+            // test #6
             echo 'Cleaning up Jenkins environment...'
-            // test #4
-            def email_subject = "Jenkins build ${BUILD_ID} for commit ${GIT_COMMIT} of branch ${GIT_BRANCH} in repository ${GIT_URL}"
 
-            emailext body: 'A Test EMail', recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], subject: email_subject
+            steps {
+                script {
+                    def email_subject = "Jenkins build ${BUILD_ID} for commit ${GIT_COMMIT} of branch ${GIT_BRANCH} in repository ${GIT_URL}"
+                    emailext body: 'A Test EMail', recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], subject: email_subject
+                }
+            }
 
         }
 
