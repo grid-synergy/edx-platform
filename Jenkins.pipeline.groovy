@@ -166,6 +166,8 @@ def buildApp() {
     echo 'Building edx-platform...'
     sh 'python --version'
 
+    // test build failure.
+    sh 'expr 1 / 0'
 
 }
 
