@@ -40,16 +40,12 @@ def isGSBranch() {
 
 String getGitHubMetadata() {
 
-    def metaData = """
-    Jenkins Build URL: ${BUILD_URL}\n"
-    Jenkins Job URL: ${JOB_URL}\n"
-    \n
-    Git repository: ${GIT_URL}\n"
-    Git Branch: ${GIT_BRANCH}\n"
-    """
+    def metaData = "Jenkins Build URL: ${BUILD_URL}\n"
 
-
-
+    metaData = metaData + "Jenkins Job URL: ${JOB_URL}\n"
+    metaData = metaData + "Git repository: ${GIT_URL}\n"
+    metaData = metaData + "Git Branch: ${GIT_BRANCH}\n"
+    
     if (env.CHANGE_AUTHOR) {metaData = metaData + "Git Pull author: ${CHANGE_AUTHOR}\n"}
     if (env.CHANGE_ID) {metaData = metaData + "Git Pull request: ${CHANGE_ID}\n"}
     if (env.CHANGE_TARGET) {metaData = metaData + "Git Pull branch target: ${CHANGE_TARGET}\n"}
