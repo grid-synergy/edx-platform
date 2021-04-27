@@ -31,12 +31,7 @@ pipeline {
                     def email_subject = "Jenkins build ${BUILD_ID} for commit ${GIT_COMMIT} of branch ${GIT_BRANCH} in repository ${GIT_URL}"
                     def email_body = gv.getGitHubMetadata()
                     emailext (
-                        recipientProviders: [
-                            [$class: 'BrokenBuildSuspectsRecipientProvider'], 
-                            [$class: 'CulpritsRecipientProvider'], 
-                            [$class: 'DevelopersRecipientProvider'], 
-                            [$class: 'RequesterRecipientProvider']
-                            ], 
+                        recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], 
                         subject: email_subject,
                         body: email_body
                     )
