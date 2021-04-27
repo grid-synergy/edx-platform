@@ -155,7 +155,7 @@ pipeline {
                         replyTo: '$DEFAULT_REPLYTO',
                         to: 'andrew@gridsynergy.com.sg'
                     
-                    slackSend channel: '#general', color: 'good', message: '$DEFAULT_CONTENT'
+                    slackSend channel: '#general', color: 'good', message: "The pipeline ${currentBuild.fullDisplayName} ${BRANCH_NAME} has stabilized."
 
                 }
 
@@ -167,7 +167,7 @@ pipeline {
                         replyTo: '$DEFAULT_REPLYTO',
                         to: 'andrew@gridsynergy.com.sg'
 
-                    slackSend channel: '#general', color: 'bad', message: '$DEFAULT_CONTENT'
+                    slackSend channel: '#general', color: 'bad', message: "The pipeline ${currentBuild.fullDisplayName} ${BRANCH_NAME} failed."
 
                 }
 
@@ -183,7 +183,7 @@ pipeline {
                         replyTo: '$DEFAULT_REPLYTO',
                         to: 'andrew@gridsynergy.com.sg'
 
-                    slackSend channel: '#general', color: 'bad', message: '$DEFAULT_CONTENT'
+                    slackSend channel: '#general', color: 'bad', message: "The pipeline ${currentBuild.fullDisplayName} ${BRANCH_NAME} is unstable."
 
                 }
 
