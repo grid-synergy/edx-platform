@@ -140,8 +140,8 @@ pipeline {
                 if (gv.isProductionBranch()) {
                     // announce on Slack.
                     echo "This pull request / commit merged to production branch."
-                    slackSend channel: '#general', color: 'good', message: "Commit to production branch ${currentBuild.fullDisplayName}\nCommit hash: ${GIT_COMMIT}\nCommit message: ${GIT_COMMIT_MSG}\nCommitted by ${GIT_COMMITTER_NAME} ${GIT_COMMITTER_EMAIL}\nFiles affected by this commit: ${gv.getChangedFilesList()}"
-                    slackSend channel: '#general', color: 'good', message: "Additional details about this build and the pipeline build log are available here: ${JOB_URL}"
+                    slackSend channel: '#codeissues', color: 'good', message: "Commit to production branch ${currentBuild.fullDisplayName}\nCommit hash: ${GIT_COMMIT}\nCommit message: ${GIT_COMMIT_MSG}\nCommitted by ${GIT_COMMITTER_NAME} ${GIT_COMMITTER_EMAIL}\nFiles affected by this commit: ${gv.getChangedFilesList()}"
+                    slackSend channel: '#codeissues', color: 'good', message: "Additional details about this build and the pipeline build log are available here: ${JOB_URL}"
                 }
             }
 
@@ -159,13 +159,13 @@ pipeline {
 
                 if (gv.isProductionBranch()) {
                     if (currentBuild.currentResult == 'SUCCESS') { // Other values: SUCCESS, UNSTABLE
-                        slackSend channel: '#general', color: 'good', message: "Pipeline for ${currentBuild.fullDisplayName} has stabilized. More info: ${JOB_URL}"
+                        slackSend channel: '#codeissues', color: 'good', message: "Pipeline for ${currentBuild.fullDisplayName} has stabilized. More info: ${JOB_URL}"
                     }
                     if (currentBuild.currentResult == 'FAILURE') { // Other values: SUCCESS, UNSTABLE
-                        slackSend channel: '#general', color: 'bad', message: "Build pipeline ${currentBuild.fullDisplayName} failed. More info: ${JOB_URL}"
+                        slackSend channel: '#codeissues', color: 'bad', message: "Build pipeline ${currentBuild.fullDisplayName} failed. More info: ${JOB_URL}"
                     }
                     if (currentBuild.currentResult == 'UNSTABLE') { // Other values: SUCCESS, UNSTABLE
-                        slackSend channel: '#general', color: 'bad', message: "Build pipeline ${currentBuild.fullDisplayName} is unstable. More info: ${JOB_URL}"
+                        slackSend channel: '#codeissues', color: 'bad', message: "Build pipeline ${currentBuild.fullDisplayName} is unstable. More info: ${JOB_URL}"
                     }
                 }
 
