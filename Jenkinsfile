@@ -138,9 +138,9 @@ pipeline {
             script {
                 if (gv.isProductionBranch()) {
                     echo "This pull request / commit merged to production branch."
-                    slackSend channel: '#general', color: 'good', message: "Commit/Merge to production branch: the pipeline ${currentBuild.fullDisplayName} ${BRANCH_NAME}. More info: ${JOB_URL}"
-                    slackSend channel: '#general', color: 'good', message: "${currentBuild.fullDisplayName} ${BRANCH_NAME} committed by ${GIT_COMMITTER_NAME} ${GIT_COMMITTER_EMAIL}"
-                    slackSend channel: '#general', color: 'good', message: "${currentBuild.fullDisplayName} ${BRANCH_NAME} changed files: ${gv.getChangedFilesList()}"
+                    slackSend channel: '#general', color: 'good', message: "Commit/Merge to production branch: the pipeline ${currentBuild.fullDisplayName}. More info: ${JOB_URL}"
+                    slackSend channel: '#general', color: 'good', message: "${currentBuild.fullDisplayName} committed by ${GIT_COMMITTER_NAME} ${GIT_COMMITTER_EMAIL}"
+                    slackSend channel: '#general', color: 'good', message: "${currentBuild.fullDisplayName} changed files: ${gv.getChangedFilesList()}"
                 }
             }
 
@@ -160,7 +160,7 @@ pipeline {
                         replyTo: '$DEFAULT_REPLYTO',
                         to: 'andrew@gridsynergy.com.sg'
                     
-                    slackSend channel: '#general', color: 'good', message: "The pipeline ${currentBuild.fullDisplayName} ${BRANCH_NAME} has stabilized. More info: ${JOB_URL}"
+                    slackSend channel: '#general', color: 'good', message: "The pipeline ${currentBuild.fullDisplayName} has stabilized. More info: ${JOB_URL}"
 
                 }
 
@@ -172,7 +172,7 @@ pipeline {
                         replyTo: '$DEFAULT_REPLYTO',
                         to: 'andrew@gridsynergy.com.sg'
 
-                    slackSend channel: '#general', color: 'bad', message: "The pipeline ${currentBuild.fullDisplayName} ${BRANCH_NAME} failed. More info: ${JOB_URL}"
+                    slackSend channel: '#general', color: 'bad', message: "The pipeline ${currentBuild.fullDisplayName} failed. More info: ${JOB_URL}"
 
                 }
 
@@ -188,7 +188,7 @@ pipeline {
                         replyTo: '$DEFAULT_REPLYTO',
                         to: 'andrew@gridsynergy.com.sg'
 
-                    slackSend channel: '#general', color: 'bad', message: "The pipeline ${currentBuild.fullDisplayName} ${BRANCH_NAME} is unstable."
+                    slackSend channel: '#general', color: 'bad', message: "The pipeline ${currentBuild.fullDisplayName} is unstable."
 
                 }
 
