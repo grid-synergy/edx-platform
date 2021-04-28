@@ -140,8 +140,8 @@ pipeline {
                 if (gv.isProductionBranch()) {
                     // announce on Slack.
                     echo "This pull request / commit merged to production branch."
-                    slackSend channel: '#general', color: 'good', message: "Commit/Merge to production branch ${currentBuild.fullDisplayName} - <<commit: ${GIT_COMMIT}>> <<message: ${GIT_COMMIT_MSG}>> by ${GIT_COMMITTER_NAME} ${GIT_COMMITTER_EMAIL}. Changed files: ${gv.getChangedFilesList()}"
-                    slackSend channel: '#general', color: 'good', message: "${currentBuild.fullDisplayName} More info: ${JOB_URL}"
+                    slackSend channel: '#general', color: 'good', message: "Commit/Merge to production branch ${currentBuild.fullDisplayName}\ncommit: ${GIT_COMMIT}\nmessage: ${GIT_COMMIT_MSG}\nBy ${GIT_COMMITTER_NAME} ${GIT_COMMITTER_EMAIL}\nChanged files: ${gv.getChangedFilesList()}"
+                    slackSend channel: '#general', color: 'good', message: "More info: ${JOB_URL}"
                 }
             }
 
