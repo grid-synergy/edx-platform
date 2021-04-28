@@ -27,19 +27,19 @@ pipeline {
                     gv = load "Jenkins.pipeline.groovy"
                     gv.initEnvironment()
 
-                    def email_subject = "Jenkins build ${BUILD_ID}: ${GIT_BRANCH} in ${GIT_URL}"
-                    def email_body = gv.getGitHubMetadata()
-                    def email_providers = [ [$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider'] ];
+                    //def email_subject = "Jenkins build ${BUILD_ID}: ${GIT_BRANCH} in ${GIT_URL}"
+                    //def email_body = gv.getGitHubMetadata()
+                    //def email_providers = [ [$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider'] ];
 
-                    email_providers.add ( [$class: 'RequesterRecipientProvider'] );
+                    //email_providers.add ( [$class: 'RequesterRecipientProvider'] );
 
-                    emailext (
-                        to: 'andrew@gridsynergy.com.sg',
-                        recipientProviders: email_providers,
-                        subject: email_subject,
-                        attachLog: true,
-                        body: email_body
-                    )
+                    //emailext (
+                    //    to: 'andrew@gridsynergy.com.sg',
+                    //    recipientProviders: email_providers,
+                    //    subject: email_subject,
+                    //    attachLog: true,
+                    //    body: email_body
+                    //)
                 }
             }
 
@@ -113,14 +113,8 @@ pipeline {
 
             echo 'Cleaning up Jenkins environment...'
 
-        }
-
-        failure {
-            
-            echo 'Jenkins post - Failure...'
-
+            // email results to the committers
             script {
-
                 emailext subject: '$DEFAULT_SUBJECT',
                     body: '$DEFAULT_CONTENT',
                     recipientProviders: [
@@ -128,15 +122,23 @@ pipeline {
                         [$class: 'RequesterRecipientProvider']
                     ], 
                     replyTo: '$DEFAULT_REPLYTO',
+                    attachLog: true,
                     to: '$DEFAULT_RECIPIENTS'
-
             }
+
+        }
+
+        failure {
+            
+            echo 'Jenkins post - Failure...'
+
         }
 
         success {
             echo 'Jenkins post - Success...'
             script {
                 if (gv.isProductionBranch()) {
+                    // announce on Slack.
                     echo "This pull request / commit merged to production branch."
                     slackSend channel: '#general', color: 'good', message: "Commit/Merge to production branch ${currentBuild.fullDisplayName} by ${GIT_COMMITTER_NAME} ${GIT_COMMITTER_EMAIL}. Changed files: ${gv.getChangedFilesList()}"
                     slackSend channel: '#general', color: 'good', message: "${currentBuild.fullDisplayName} More info: ${JOB_URL}"
@@ -147,48 +149,24 @@ pipeline {
 
         changed {
             script {
-                if (currentBuild.currentResult == 'SUCCESS') { // Other values: SUCCESS, UNSTABLE
-                    // Send an email only if the build status has changed from green/unstable to red
-                    emailext subject: '$DEFAULT_SUBJECT',
-                        body: '$DEFAULT_CONTENT',
-                        recipientProviders: [
-                            [$class: 'CulpritsRecipientProvider'],
-                            [$class: 'DevelopersRecipientProvider'],
-                            [$class: 'RequesterRecipientProvider']
-                        ], 
-                        replyTo: '$DEFAULT_REPLYTO',
-                        to: 'andrew@gridsynergy.com.sg'
-                    
-                    slackSend channel: '#general', color: 'good', message: "Pipeline for ${currentBuild.fullDisplayName} has stabilized. More info: ${JOB_URL}"
+                // email our culprits that the state has changed.
+                emailext subject: '$DEFAULT_SUBJECT',
+                    body: '$DEFAULT_CONTENT',
+                    recipientProviders: [[$class: 'CulpritsRecipientProvider']], 
+                    replyTo: '$DEFAULT_REPLYTO',
+                    attachLog: true,
+                    to: 'andrew@gridsynergy.com.sg, lpm0073@gmail.com'
 
-                }
-
-                if (currentBuild.currentResult == 'FAILURE') { // Other values: SUCCESS, UNSTABLE
-                    // Send an email only if the build status has changed from green/unstable to red
-                    emailext subject: '$DEFAULT_SUBJECT',
-                        body: '$DEFAULT_CONTENT',
-                        recipientProviders: [[$class: 'CulpritsRecipientProvider']], 
-                        replyTo: '$DEFAULT_REPLYTO',
-                        to: 'andrew@gridsynergy.com.sg'
-
-                    slackSend channel: '#general', color: 'bad', message: "Build pipeline ${currentBuild.fullDisplayName} failed. More info: ${JOB_URL}"
-
-                }
-
-                if (currentBuild.currentResult == 'UNSTABLE') { // Other values: SUCCESS, UNSTABLE
-                    // Send an email only if the build status has changed from green/unstable to red
-                    emailext subject: '$DEFAULT_SUBJECT',
-                        body: '$DEFAULT_CONTENT',
-                        recipientProviders: [
-                            [$class: 'CulpritsRecipientProvider'],
-                            [$class: 'DevelopersRecipientProvider'],
-                            [$class: 'RequesterRecipientProvider']
-                        ], 
-                        replyTo: '$DEFAULT_REPLYTO',
-                        to: 'andrew@gridsynergy.com.sg'
-
-                    slackSend channel: '#general', color: 'bad', message: "Build pipeline ${currentBuild.fullDisplayName} is unstable."
-
+                if (gv.isProductionBranch()) {
+                    if (currentBuild.currentResult == 'SUCCESS') { // Other values: SUCCESS, UNSTABLE
+                        slackSend channel: '#general', color: 'good', message: "Pipeline for ${currentBuild.fullDisplayName} has stabilized. More info: ${JOB_URL}"
+                    }
+                    if (currentBuild.currentResult == 'FAILURE') { // Other values: SUCCESS, UNSTABLE
+                        slackSend channel: '#general', color: 'bad', message: "Build pipeline ${currentBuild.fullDisplayName} failed. More info: ${JOB_URL}"
+                    }
+                    if (currentBuild.currentResult == 'UNSTABLE') { // Other values: SUCCESS, UNSTABLE
+                        slackSend channel: '#general', color: 'bad', message: "Build pipeline ${currentBuild.fullDisplayName} is unstable. More info: ${JOB_URL}"
+                    }
                 }
 
             }
