@@ -71,6 +71,7 @@ String getGitHubMetadata() {
     if (env.CHANGE_TARGET) {metaData = metaData + "Git Pull branch target: ${CHANGE_TARGET}\n"}
     
     metaData = metaData + "Git Commit: ${GIT_COMMIT}\n"
+    metaData = metaData + "Git Commit Message: ${GIT_COMMIT_MSG}\n"
     metaData = metaData + "Git Build Number: ${BUILD_NUMBER}\n"
     if (env.GIT_COMMITTER_NAME) {
             metaData = metaData + "Git committer: ${GIT_COMMITTER_NAME} ${GIT_COMMITTER_EMAIL}\n"
@@ -154,6 +155,7 @@ def initEnvironment() {
     changedFiles = getChangedFilesList()
 
     echo 'Initializing Jenkins environment...'
+    env.GIT_COMMIT_MSG = sh (script: 'git log -1 --pretty=%B ${GIT_COMMIT}', returnStdout: true).trim()
     echo getGitHubMetadata()
 
 }
