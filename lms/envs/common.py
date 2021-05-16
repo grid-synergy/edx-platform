@@ -4219,3 +4219,7 @@ CKEDITOR_CONFIGS = {
         ]
     },
 }
+
+################# Settings for Subscription Djangoapp #####################
+STRIPE_API_KEY = os.environ.get("STRIPE_API_KEY")
+STRIPE_WEBHOOK_SECRET_KEY = os.environ.get("STRIPE_WEBHOOK_SECRET_KEY")
