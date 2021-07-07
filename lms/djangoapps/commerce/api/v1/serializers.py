@@ -11,6 +11,7 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import serializers
 
 from common.djangoapps.course_modes.models import CourseMode
+from lms.djangoapps.lhub_ecommerce_offer.models import Coupon
 from xmodule.modulestore.django import modulestore
 
 from .models import UNDEFINED, Course
@@ -20,6 +21,7 @@ class CourseModeSerializer(serializers.ModelSerializer):
     """ CourseMode serializer. """
     name = serializers.CharField(source='mode_slug')
     price = serializers.FloatField(source='min_price')
+    price_string = serializers.CharField(source='get_price_string', required=False)
     expires = serializers.DateTimeField(
         source='expiration_datetime',
         required=False,
@@ -35,9 +37,42 @@ class CourseModeSerializer(serializers.ModelSerializer):
 
     class Meta(object):
         model = CourseMode
-        fields = ('name', 'currency', 'price', 'sku', 'bulk_sku', 'expires')
+        fields = ('name', 'currency', 'price', 'price_string', 'sku', 'bulk_sku', 'expires')
         # For disambiguating within the drf-yasg swagger schema
         ref_name = 'commerce.CourseMode'
+
+
+
+class AvailableVouchersSerializer(serializers.ModelSerializer):
+    """ AvailableVouchers serializer. """
+    name = serializers.CharField()
+    code = serializers.CharField(source="coupon_code")
+    discount_type = serializers.CharField(source="incentive_type")
+    discount_value = serializers.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        source="incentive_value"
+    )
+    allow_combine = serializers.BooleanField(source="is_exclusive")
+
+    def get_identity(self, data):
+        try:
+            return data.get('name', None)
+        except AttributeError:
+            return None
+
+    class Meta(object):
+        model = Coupon
+        fields = (
+            'name',
+            'code',
+            'discount_type',
+            'discount_value',
+            'allow_combine',
+        )
+        # For disambiguating within the drf-yasg swagger schema
+        ref_name = 'lms.Coupon'
+
 
 
 def validate_course_id(course_id):
@@ -122,7 +157,9 @@ class CourseSerializer(serializers.Serializer):
     verification_deadline = PossiblyUndefinedDateTimeField(format=None, allow_null=True, required=False)
     modes = CourseModeSerializer(many=True)
     discount_applicable = serializers.BooleanField(required=False)
+    discount_type = serializers.CharField(required=False)
     discounted_price = serializers.FloatField(required=False)
+    discounted_price_string = serializers.CharField(required=False)
     sale_type = serializers.CharField(required=False)
     subcategory_id = serializers.CharField(required=False)
     category = serializers.CharField(required=False)
@@ -130,12 +167,14 @@ class CourseSerializer(serializers.Serializer):
     is_premium = serializers.BooleanField(required=False)
     media = _CourseApiMediaCollectionSerializer(source='*',required=False)
     discount_percentage = serializers.FloatField(required=False)
+    discount_percentage_string = serializers.CharField(required=False)
     allow_review = serializers.BooleanField(required=False)
+    voucher_applicable = serializers.BooleanField(required=False, source='coupon_applicable')
+    available_vouchers = AvailableVouchersSerializer(required=False, many=True)
 
     class Meta(object):
         # For disambiguating within the drf-yasg swagger schema
         ref_name = 'commerce.Course'
-
     def validate(self, attrs):
         """ Ensure the verification deadline occurs AFTER the course mode enrollment deadlines. """
         verification_deadline = attrs.get('verification_deadline', None)
@@ -196,6 +235,11 @@ class CourseSerializer(serializers.Serializer):
             CourseMode(**modes_dict)
             for modes_dict in modes_data
         ]
+class WebCourseSerializer(CourseSerializer):
+    """ Web Course serializer. """
+    start_date = serializers.CharField()
+    organization = serializers.CharField()
+    course_number = serializers.CharField()
 
 class CourseDetailSerializer(serializers.Serializer):
     """ Course serializer. """
@@ -209,17 +253,23 @@ class CourseDetailSerializer(serializers.Serializer):
     verification_deadline = PossiblyUndefinedDateTimeField(format=None, allow_null=True, required=False)
     modes = CourseModeSerializer(many=True)
     discount_applicable = serializers.BooleanField(required=False)
-    discounted_price = serializers.FloatField(required=False)
+    discounted_price_string = serializers.CharField(required=False)
+    discount_type = serializers.CharField(required=False)
+    discounted_price = serializers.CharField(required=False)
     sale_type = serializers.CharField(required=False)
     subcategory_id = serializers.CharField(required=False)
     platform_visibility = serializers.CharField(required=False)
     is_premium = serializers.BooleanField(required=False)
     media = _CourseApiMediaCollectionSerializer(source='*',required=False)
     discount_percentage = serializers.FloatField(required=False)
+    discount_percentage_string = serializers.CharField(required=False)
     chapter_count = serializers.IntegerField(required=False)
     description = serializers.CharField(required=False)
     allow_review = serializers.BooleanField()
     is_enrolled = serializers.BooleanField(required=False)
+    own_feedback = serializers.BooleanField(required=False)
+    voucher_applicable = serializers.BooleanField(required=False)
+    available_vouchers = AvailableVouchersSerializer(required=False, many=True)
 
     class Meta(object):
         # For disambiguating within the drf-yasg swagger schema
@@ -286,8 +336,8 @@ class CourseDetailSerializer(serializers.Serializer):
             for modes_dict in modes_data
         ]
 
-
-
+class WebCourseDetailSerializer(CourseDetailSerializer):
+    """ WebCourse serializer. """
 
 class CourseDetailCheckoutSerializer(serializers.Serializer):
     """ Course serializer. """
@@ -312,6 +362,7 @@ class CourseDetailCheckoutSerializer(serializers.Serializer):
     description = serializers.CharField(required=False)
     new_category = serializers.CharField(required=False)
     organization = serializers.CharField(required=False)
+    available_vouchers = AvailableVouchersSerializer(many=True)
 
     class Meta(object):
         # For disambiguating within the drf-yasg swagger schema
@@ -377,5 +428,5 @@ class CourseDetailCheckoutSerializer(serializers.Serializer):
             CourseMode(**modes_dict)
             for modes_dict in modes_data
         ]
-
-
+class WebCourseDetailCheckoutSerializer(CourseDetailCheckoutSerializer):
+    """ WebCourse serializer. """

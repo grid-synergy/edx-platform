@@ -126,6 +126,7 @@ FEATURES = {
     # .. toggle_warnings: None
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/3064
     'ENABLE_TEXTBOOK': True,
+    'IS_NOTE_TAB_ENABLED': True,
 
     # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
     # this should remain off in production until digest notifications are online.
@@ -478,7 +479,7 @@ FEATURES = {
     'LICENSING': False,
 
     # Certificates Web/HTML Views
-    'CERTIFICATES_HTML_VIEW': False,
+    'CERTIFICATES_HTML_VIEW': True,
 
     # .. toggle_name: ENABLE_COURSE_DISCOVERY
     # .. toggle_implementation: DjangoSetting
@@ -2773,8 +2774,17 @@ INSTALLED_APPS = [
     #LHUB Mobile APIs
     'lms.djangoapps.lhub_mobile.apps.LhubMobileConfig',
 
+    #LHUB_ECOMMERCE_OFFER
+    'lms.djangoapps.lhub_ecommerce_offer.apps.LhubEcommerceOfferConfig',
+
     'lms.djangoapps.lhub_notification.apps.NotificationConfig',
     'lms.djangoapps.lhub_extended_api.apps.LhubExtendedApiConfig',
+
+    #banner related
+    'lms.djangoapps.banner.apps.BannerConfig',
+
+    #course_block_user related
+    'lms.djangoapps.course_block_user.apps.CourseBlockUserConfig'
 ]
 
 ######################### CSRF #########################################

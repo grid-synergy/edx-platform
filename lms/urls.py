@@ -209,11 +209,20 @@ urlpatterns = [
     # LHUB MOBILE API
     url(r'^api/lhub_mobile/', include('lms.djangoapps.lhub_mobile.urls')),
     url(r'^lhub/', include('lms.djangoapps.lhub_notification.urls')),
+
+
 ]
 
 urlpatterns += [
     url(r'^lhub_extended_api/', include('lms.djangoapps.lhub_extended_api.urls')),
 ]
+
+urlpatterns += [
+    url(r'^lhub_ecommerce_offer/', include('lms.djangoapps.lhub_ecommerce_offer.urls')),
+]
+
+
+
 
 if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):
     urlpatterns += [
@@ -832,6 +841,16 @@ urlpatterns += [
     url(r'api/note/', include(('lms.djangoapps.note.urls', 'lms.djangoapps.note'), namespace='note')),
 ]
 
+if settings.FEATURES.get('IS_NOTE_TAB_ENABLED'):
+   urlpatterns += (
+       url(
+           r'^courses/{}/note/'.format(
+               settings.COURSE_ID_PATTERN,
+           ),
+           include('lms.djangoapps.note.urls'),
+           name='note',
+       ),
+   )
 # Embargo
 if settings.FEATURES.get('EMBARGO'):
     urlpatterns += [
@@ -1026,4 +1045,15 @@ urlpatterns += [
 # Course Experience API urls
 urlpatterns += [
     url(r'^api/course_experience/', include('openedx.features.course_experience.api.v1.urls')),
+]
+
+#Banner API
+urlpatterns += [
+    url(r'^api/banner/', include('lms.djangoapps.banner.api.urls')),
+
+]
+
+#Course Block User API
+urlpatterns += [
+    url(r'^/course_block_user/', include('lms.djangoapps.course_block_user.urls')),
 ]

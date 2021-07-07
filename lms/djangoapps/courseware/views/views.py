@@ -7,7 +7,7 @@ import json
 import logging
 from collections import OrderedDict, namedtuple
 from datetime import datetime
-
+from custom_reg_form.models import UserExtraInfo
 import bleach
 import requests
 import six
@@ -73,6 +73,7 @@ from lms.djangoapps.courseware.courses import (
     get_studio_url,
     sort_by_announcement,
     sort_by_start_date,
+    sort_by_enrollments,
     sort_by_rating,
     sort_by_price,
 
@@ -142,6 +143,8 @@ from ..entrance_exams import user_can_skip_entrance_exam
 from ..module_render import get_module, get_module_by_usage_id, get_module_for_descriptor
 from commerce.api.v1.models import Course
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
+from lms.djangoapps.banner.models import Banner
+from lms.djangoapps.course_block_user.models import CourseBlockUser
 
 log = logging.getLogger("edx.courseware")
 
@@ -263,11 +266,21 @@ def courses(request):
     """
     sort = request.GET.get('sort', '')
     category_id = request.GET.get('category')
+    if category_id == "":
+        category_id = None
     subcategory_id = request.GET.get('subcategory')
+    if subcategory_id == "":
+        subcategory_id = None
     difficulty_level_id = request.GET.get('difficulty_level')
+    if difficulty_level_id == "":
+        difficulty_level_id = None
     mode = request.GET.get('mode', '')
-    category = sub_category = difficulty_level = None
+    # if request.GET.keys()
 
+    if mode == "":
+        mode = None
+    category = sub_category = difficulty_level = None
+    show_categorized_view = True
     courses_list = []
     filter_ = None
     course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
@@ -291,8 +304,12 @@ def courses(request):
             courses_list = sort_by_rating(courses_list)
         elif sort == 'price':
             courses_list = sort_by_price(courses_list)
+        elif sort == "enrollments":
+            courses_list = sort_by_enrollments(courses_list)
+        # else:
+        #     courses_list = sort_by_announcement(courses_list)
         else:
-            courses_list = sort_by_announcement(courses_list)
+            sort = None
 
     programs_list = get_programs_with_type(request.site, include_hidden=False)
 
@@ -308,7 +325,8 @@ def courses(request):
     def filter_courses(course):
         if course.platform_visibility not in ["Web", "Both", None]:
             return False
-
+        print('===========123123')
+        print(course.new_category_id)
         if category and course.new_category_id != category.id:
             return False
 
@@ -339,9 +357,27 @@ def courses(request):
     elif sub_category:
         selected_category_name = '{} - {}'.format(sub_category.category.name, sub_category.name)
 
+    banner_list = Banner.objects.filter(platform__in = ['WEB', 'BOTH'], enabled=True)
+
+    if len(request.GET.keys()) ==  0:
+
+        show_categorized_view = True
+
+    elif len(request.GET.keys()) > 0:
+        if (difficulty_level_id==None) and (sort==None) and (mode==None) and (category_id==None) and (subcategory_id == None):
+            show_categorized_view = True
+        else:
+            show_categorized_view = False
+    else:
+        show_categorized_view = False
+    user_category = None
+    user_extra_info = UserExtraInfo.objects.filter(user_id=request.user.id).first()
+    if hasattr(user_extra_info, 'industry_id'):
+        user_category = Category.objects.filter(id=user_extra_info.industry_id).first().id
     return render_to_response(
         "courseware/courses.html",
         {
+
             'courses': courses_list,
             'course_discovery_meanings': course_discovery_meanings,
             'programs_list': programs_list,
@@ -351,7 +387,11 @@ def courses(request):
             'selected_difficulty_level_id': difficulty_level.id if difficulty_level else '',
             'selected_mode': mode,
             'sort': sort,
-        }
+            'banner_list': banner_list,
+            'show_categorized_view': show_categorized_view,
+            'user_industry': user_category,
+        },
+
     )
 
 
@@ -606,9 +646,9 @@ def course_info(request, course_id):
             configuration_helpers.get_value('COURSE_HOMEPAGE_SHOW_ORG', True)
 
         course_title = course.display_number_with_default
-        course_subtitle = course.display_name_with_default
+        course_subtitle = course.display_name_with_default if course else None
         if course_homepage_invert_title:
-            course_title = course.display_name_with_default
+            course_title = course.display_name_with_default if course else None
             course_subtitle = course.display_number_with_default
 
         context = {
@@ -1766,6 +1806,8 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
     course_key = usage_key.course_key
 
     requested_view = request.GET.get('view', 'student_view')
+    next_ = None
+    previous = None
     if requested_view != 'student_view':
         return HttpResponseBadRequest(
             u"Rendering of the xblock view '{}' is not supported.".format(bleach.clean(requested_view, strip=True))
@@ -1798,6 +1840,59 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
 
         missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, request.user)
 
+        path_ = request.get_full_path()
+        next_qry = None
+        previous_qry = None
+        if path_ and request.user.id:
+            ref_obj = CourseBlockUser.objects.filter(block_mobile_view__icontains = path_, user=request.user)
+            ref_obj.id = ref_obj[0].id if ref_obj else None
+            base_url = path_.split("/xblock/")
+            if ref_obj and ref_obj.id:
+                next_qry = CourseBlockUser.objects.filter(pk=int(ref_obj.id) + 1)
+                previous_qry = CourseBlockUser.objects.filter(pk=int(ref_obj.id) - 1)
+                ref_obj = ref_obj[0]
+            else:
+                ref_obj = CourseBlockUser.objects.filter(descendants__icontains=path_, user=request.user)
+                ref_obj = ref_obj[0] if ref_obj else None
+
+            if ref_obj and ref_obj.descendants:
+                #loop and split
+                sub_sections = ref_obj.descendants.strip('[]').split(",")
+                print('tt', sub_sections)
+               #process middle
+                if ref_obj.processed_descendants and ref_obj.processed_descendants+1 < len(sub_sections):
+                    next_ = base_url[0] +'/xblock/'+ (sub_sections[ref_obj.processed_descendants+1]).replace("'", "")
+                    ref_obj.processed_descendants += 1
+                else:
+                    # start of black , initial
+                    if len(sub_sections) >=2 and not ref_obj.processed_descendants:
+                        next_ = base_url[0] + '/xblock/'+(sub_sections[1]).replace("'", "")
+                    else:
+                        # start of block , other condition , jump to next major block
+                        next_qry = CourseBlockUser.objects.filter(pk=int(ref_obj.id) + 1)
+                        if next_qry.exists():
+                            next_ = next_qry[0].block_mobile_view
+                    ref_obj.processed_descendants = 0
+
+                if ref_obj.processed_descendants and ref_obj.processed_descendants > 0:
+
+                    previous = base_url[0]+ '/xblock/'+(sub_sections[ref_obj.processed_descendants-1]).replace("'", "")
+                    ref_obj.processed_descendants += 1
+                else:
+                    previous_qry = CourseBlockUser.objects.filter(pk=int(ref_obj.id) - 1)
+                    if not ref_obj.processed_descendants and previous_qry.exists():
+                        previous = previous_qry[0].block_mobile_view
+                    else:
+                        previous = base_url[0]+ '/xblock/'+(sub_sections[0]).replace("'", "")
+                    ref_obj.processed_descendants = 0
+            #no sub section
+            else:
+                if next_qry and next_qry.exists():
+                    next_ = next_qry[0].block_mobile_view
+                if previous_qry and previous_qry.exists():
+                    previous = previous_qry[0].block_mobile_view
+            ref_obj.save() if ref_obj else None
+
         context = {
             'fragment': block.render('student_view', context=student_view_context),
             'course': course,
@@ -1819,7 +1914,10 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'is_learning_mfe': is_request_from_learning_mfe(request),
             'is_mobile_app': is_request_from_mobile_app(request),
             'reset_deadlines_url': reverse(RESET_COURSE_DEADLINES_NAME),
+            'next_': next_ if next_ else False,
+            'previous': previous if previous else False
         }
+
         return render_to_response('courseware/courseware-chromeless.html', context)
 
 
